@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'LoginPage.dart';
-import 'SignUpPage.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'login/LoginPage.dart';
+import 'login/SignUpPage.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});

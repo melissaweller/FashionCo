@@ -1,36 +1,40 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'LoginPage.dart';
-import 'package:project/FirebaseAuthService.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:project/models/FirebaseAuthService.dart';
+import 'package:project/MainPage.dart';
+import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../models/Navigation.dart';
+import '../models/UserModel.dart';
 
-class SignUpPage extends StatefulWidget {
-  const SignUpPage({super.key});
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
 
   @override
-  State<SignUpPage> createState() => _SignUpPageState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
-class _SignUpPageState extends State<SignUpPage> {
+class _LoginPageState extends State<LoginPage> {
 
   final FirebaseAuthService _auth = FirebaseAuthService();
 
-  TextEditingController _usernameController = TextEditingController();
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
 
-  void _register() async {
-    String name = _usernameController.text;
+  void _login() async {
     String email = _emailController.text;
     String password = _passwordController.text;
 
-    var user = await _auth.register(email, password);
+    var user = await _auth.login(email, password);
+
     if(user != null){
-      print("User has been successfully created");
-      Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPage()));
+      print("User has been successfully signed in");
+
+      String? username = await getIdByEmail(_emailController.text);
+      Navigator.push(context, MaterialPageRoute(builder: (context)=> Navigation(username: username)));
+
+      // Navigator.push(context, MaterialPageRoute(builder: (context)=> MainPage()));
     }else{
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Your password must be at least 6 characters.")));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Your email or password is invalid. Please try again.")));
     }
   }
 
@@ -59,23 +63,10 @@ class _SignUpPageState extends State<SignUpPage> {
                 ),
                 child: Column(
                   children: [
-                    Text('Create a New Account', style: TextStyle(fontSize: 30),),
+                    Text('Login', style: TextStyle(fontSize: 30),),
                     SizedBox(height: 10,),
-                    Text('Already registered? Login', style: TextStyle(fontSize: 14),),
+                    Text('Sign in to continue', style: TextStyle(fontSize: 14),),
                     SizedBox(height: 20,),
-                    TextField(
-                      controller: _usernameController,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: 'Name',
-                        prefixIcon: Align(
-                          widthFactor: 1.0,
-                          heightFactor: 1.0,
-                          child: Icon(Icons.person_2_outlined, color: Colors.pink[400],),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 10,),
                     TextField(
                       controller: _emailController,
                       decoration: InputDecoration(
@@ -109,9 +100,9 @@ class _SignUpPageState extends State<SignUpPage> {
                             minimumSize: Size(300, 40)
                         ),
                         onPressed: (){
-                          _register();
+                          _login();
                         },
-                        child: Text('SIGN UP')
+                        child: Text('LOGIN')
                     ),
                   ],
                 )
@@ -121,4 +112,24 @@ class _SignUpPageState extends State<SignUpPage> {
       ),
     );
   }
+}
+
+Future<String?> getIdByEmail(String email) async {
+  String? username;
+
+  try {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('Users')
+        .where('email', isEqualTo: email)
+        .get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      var userModel = UserModel.fromSnapshot(querySnapshot.docs.first as DocumentSnapshot<Map<String, dynamic>>);
+      username = userModel.username;
+    }
+  } catch (error) {
+    print('Error getting username: $error');
+  }
+
+  return username;
 }
