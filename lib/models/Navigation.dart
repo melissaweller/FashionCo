@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../AccountPage.dart';
-import '../CartPage.dart';
-import '../ProductPage.dart';
-import '../SearchPage.dart';
+import '../navPages/AccountPage.dart';
+import '../navPages/CartPage.dart';
+import '../navPages/ProductPage.dart';
+import '../navPages/SearchPage.dart';
 
 
 class Navigation extends StatefulWidget {

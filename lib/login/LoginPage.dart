@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:project/models/FirebaseAuthService.dart';
-import 'package:project/MainPage.dart';
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/Navigation.dart';
