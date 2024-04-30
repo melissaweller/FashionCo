@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:project/login/ForgotPassword.dart';
 import 'package:project/models/FirebaseAuthService.dart';
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/Navigation.dart';
 import '../models/UserModel.dart';
+import 'SignUpPage.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -30,9 +32,8 @@ class _LoginPageState extends State<LoginPage> {
 
       String? username = await getIdByEmail(_emailController.text);
       Navigator.push(context, MaterialPageRoute(builder: (context)=> Navigation(username: username)));
-
-      // Navigator.push(context, MaterialPageRoute(builder: (context)=> MainPage()));
-    }else{
+    }
+    else{
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Your email or password is invalid. Please try again.")));
     }
   }
@@ -40,10 +41,11 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
+      body: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            SizedBox(height: 80,),
             Container(
               height: 200,
               width: 200,
@@ -53,8 +55,9 @@ class _LoginPageState extends State<LoginPage> {
               ),
               child: Image.asset('assets/logo.png', height: 75, width: 75),
             ),
-            SizedBox(height: 60,),
+            SizedBox(height: 20,),
             Container(
+              padding: EdgeInsets.all(20),
                 height: 400,
                 width: 400,
                 decoration: BoxDecoration(
@@ -64,7 +67,12 @@ class _LoginPageState extends State<LoginPage> {
                   children: [
                     Text('Login', style: TextStyle(fontSize: 30),),
                     SizedBox(height: 10,),
-                    Text('Sign in to continue', style: TextStyle(fontSize: 14),),
+                    GestureDetector(
+                      onTap:(){
+                        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=> SignUpPage()), (route) => false);
+                      },
+                      child: Text("Don't have an Account? Register Now!", style: TextStyle(color: Colors.pink[900], fontWeight: FontWeight.bold),),
+                    ),
                     SizedBox(height: 20,),
                     TextField(
                       controller: _emailController,
@@ -103,6 +111,13 @@ class _LoginPageState extends State<LoginPage> {
                         },
                         child: Text('LOGIN')
                     ),
+                    SizedBox(height: 10,),
+                    GestureDetector(
+                      onTap:(){
+                        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=> ForgotPassword()), (route) => false);
+                      },
+                      child: Text('Forgot Password?', style: TextStyle(color: Colors.pink[900], fontWeight: FontWeight.bold),),
+                    )
                   ],
                 )
             ),

@@ -49,20 +49,26 @@ class _SignUpPageState extends State<SignUpPage> {
                 color: Colors.pink[400],
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Image.asset('assets/logo.png', height: 75, width: 75),
+              child: Image.asset('assets/logo.png', height: 50, width: 50),
             ),
-            SizedBox(height: 60,),
+            SizedBox(height: 10,),
             Container(
-                height: 400,
+              padding: EdgeInsets.all(20),
+                height: 450,
                 width: 400,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Column(
                   children: [
-                    Text('Create a New Account', style: TextStyle(fontSize: 30),),
+                    Text('Create a New Account', style: TextStyle(fontSize: 25),),
                     SizedBox(height: 10,),
-                    Text('Already registered? Login', style: TextStyle(fontSize: 14),),
+                    GestureDetector(
+                      onTap:(){
+                        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=> LoginPage()), (route) => false);
+                      },
+                      child: Text('Already have an account? Sign In', style: TextStyle(color: Colors.pink[900], fontWeight: FontWeight.bold),),
+                    ),
                     SizedBox(height: 20,),
                     TextField(
                       controller: _usernameController,
@@ -102,7 +108,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 30,),
+                    SizedBox(height: 10,),
                     ElevatedButton(
                         style: ElevatedButton.styleFrom(
                             foregroundColor: Colors.black,
@@ -119,18 +125,6 @@ class _SignUpPageState extends State<SignUpPage> {
                         child: Text('SIGN UP')
                     ),
                     SizedBox(height: 10,),
-                    Row(
-                      children: [
-                        Text("Already have an account?"),
-                        SizedBox(width: 5,),
-                        GestureDetector(
-                          onTap:(){
-                            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=> LoginPage()), (route) => false);
-                          },
-                          child: Text('Sign In', style: TextStyle(color: Colors.deepPurpleAccent, fontWeight: FontWeight.bold),),
-                        )
-                      ],
-                    )
                   ],
                 )
             ),

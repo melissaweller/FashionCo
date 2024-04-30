@@ -1,44 +1,54 @@
 import 'dart:async';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:project/models/FirebaseAuthService.dart';
-
 import 'dart:convert';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-
-import 'itemPage.dart';
+import 'CartPage.dart';
+import 'ItemPage.dart';
+import 'ProductCard.dart';
 
 class ProductPage extends StatefulWidget {
-  final String? username;
-
-  const ProductPage({this.username});
-
   @override
-  State<ProductPage> createState() => _ProductPageState();
+  _ProductPageState createState() => _ProductPageState();
 }
 
 class _ProductPageState extends State<ProductPage> {
-  List<dynamic> products = [];
+  List<dynamic> searchResults = [];
+  List<dynamic> allProducts = []; // Store all products
+  List<dynamic> cart = []; // Initialize cart
+  TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    fetchProducts();
+    fetchSearchResults();
   }
 
-  Future<void> fetchProducts() async {
-    final response =
-    await http.get(Uri.parse('https://fakestoreapi.com/products'));
+  Future<void> fetchSearchResults() async {
+    final response = await http.get(Uri.parse('https://fakestoreapi.com/products'));
     if (response.statusCode == 200) {
       setState(() {
-        products = json.decode(response.body);
+        searchResults = json.decode(response.body);
+        allProducts = List.from(searchResults); // Store all products
       });
     } else {
-      throw Exception('Failed to load products');
+      throw Exception('Failed to load search results');
     }
+  }
+
+  void search(String query) {
+    List<dynamic> results = [];
+    if (query.isEmpty) {
+      results = List.from(allProducts); // Show all products if search query is empty
+    } else {
+      results = allProducts
+          .where((product) =>
+      product['title'].toLowerCase().contains(query.toLowerCase()) ||
+          product['category'].toLowerCase().contains(query.toLowerCase()))
+          .toList();
+    }
+    setState(() {
+      searchResults = results;
+    });
   }
 
   void navigateToItemPage(BuildContext context, dynamic product) {
@@ -50,48 +60,71 @@ class _ProductPageState extends State<ProductPage> {
     );
   }
 
+  void addToCart(dynamic product) {
+    int existingIndex = cart.indexWhere((item) => item['id'] == product['id']);
+
+    if (existingIndex != -1) {
+      setState(() {
+        cart[existingIndex]['quantity'] += 1;
+      });
+    } else {
+      setState(() {
+        cart.add({...product, 'quantity': 1});
+      });
+    }
+  }
+
+  void navigateToCartPage(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CartPage(cart: cart),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: SingleChildScrollView(
-          child: SizedBox(
-            height: MediaQuery.of(context).size.height,
-            child: GridView.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                mainAxisSpacing: 10,
-                crossAxisSpacing: 10,
-                childAspectRatio: 0.7,
+      appBar: AppBar(
+        title: Text('Fashion Co.'),
+        backgroundColor: Colors.pink[400],
+        centerTitle: true,
+        actions: [
+          IconButton(
+            onPressed: () => navigateToCartPage(context),
+            icon: Icon(Icons.shopping_cart, color: Colors.white,),
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: _searchController,
+              onChanged: (value) => search(value),
+              decoration: InputDecoration(
+                hintText: 'Search...',
+                prefixIcon: Icon(Icons.search),
               ),
-              itemCount: products.length,
-              itemBuilder: (BuildContext context, int index) {
-                final product = products[index];
-                return GestureDetector(
-                  onTap: () => navigateToItemPage(context, product),
-                  child: Card(
-                    margin: EdgeInsets.all(0),
-                    child: Padding(
-                      padding: EdgeInsets.all(10),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Image.network(product['image'], height: 120),
-                          SizedBox(height: 10),
-                          Text(product['title'], style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                          SizedBox(height: 5),
-                          Text('\$${product['price'].toString()}', style: TextStyle(fontSize: 14, color: Colors.green)),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              },
             ),
           ),
-        ),
-      )
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: searchResults.map((product) {
+                  return ProductCard(
+                    product: product,
+                    onTap: () => navigateToItemPage(context, product),
+                    addToCart: () => addToCart(product), // Pass the addToCart function to ProductCard
+                  );
+                }).toList(),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
-
