@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -60,6 +61,29 @@ class _ProductPageState extends State<ProductPage> {
     );
   }
 
+  // void addToCart(dynamic product) {
+  //   int existingIndex = cart.indexWhere((item) => item['id'] == product['id']);
+  //
+  //   if (existingIndex != -1) {
+  //     setState(() {
+  //       cart[existingIndex]['quantity'] += 1;
+  //     });
+  //   } else {
+  //     setState(() {
+  //       cart.add({...product, 'quantity': 1});
+  //     });
+  //
+  //     // Add product to Firestore cart collection
+  //     FirebaseFirestore.instance.collection('cart').add({
+  //       'id': product['id'],
+  //       'title': product['title'],
+  //       'price': product['price'],
+  //       'quantity': 1, // Initial quantity is 1
+  //       'image': product['image'],
+  //     });
+  //   }
+  // }
+
   void addToCart(dynamic product) {
     int existingIndex = cart.indexWhere((item) => item['id'] == product['id']);
 
@@ -67,9 +91,24 @@ class _ProductPageState extends State<ProductPage> {
       setState(() {
         cart[existingIndex]['quantity'] += 1;
       });
+      // Update quantity in Firestore
+      FirebaseFirestore.instance.collection('cart').doc(cart[existingIndex]['docId']).update({
+        'quantity': cart[existingIndex]['quantity'],
+      });
     } else {
       setState(() {
         cart.add({...product, 'quantity': 1});
+      });
+      // Add product to Firestore cart collection
+      FirebaseFirestore.instance.collection('cart').add({
+        'id': product['id'],
+        'title': product['title'],
+        'price': product['price'],
+        'quantity': 1, // Initial quantity is 1
+        'image': product['image'],
+      }).then((docRef) {
+        // Store the document ID for future updates
+        cart[cart.length - 1]['docId'] = docRef.id;
       });
     }
   }
@@ -78,10 +117,11 @@ class _ProductPageState extends State<ProductPage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => CartPage(cart: cart),
+        builder: (context) => CartPage(),
       ),
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
