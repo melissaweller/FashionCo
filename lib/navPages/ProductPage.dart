@@ -20,12 +20,12 @@ class ProductPage extends StatefulWidget {
 
 class _ProductPageState extends State<ProductPage> {
 
-  String? email;
+  late String email;
 
   void setInfo() async {
     String? em = await getEmailById(widget.userId);
     setState(() {
-      email = em;
+      email = em!;
     });
   }
 
@@ -112,7 +112,7 @@ class _ProductPageState extends State<ProductPage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => CartPage(),
+        builder: (context) => CartPage(userEmail: email,),
       ),
     );
   }

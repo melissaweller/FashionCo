@@ -18,6 +18,7 @@ class AccountPage extends StatefulWidget {
 
 class _AccountPageState extends State<AccountPage> {
 
+  String? id;
   String? username;
   String? email;
 
@@ -40,9 +41,15 @@ class _AccountPageState extends State<AccountPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        appBar: AppBar(
+          title: Text('Fashion Co.'),
+          backgroundColor: Colors.pink[400],
+          centerTitle: true,
+        ),
         body: Center(
             child: Column(
               children: [
+                SizedBox(height: 20,),
                 Container(
                   padding: EdgeInsets.all(10),
                   child: Column(
@@ -75,7 +82,7 @@ class _AccountPageState extends State<AccountPage> {
                         Divider(color: Colors.black,),
                         _CustomListTile(title: "Account Details", leading: Icons.cloud_outlined, trailing: Icons.arrow_forward,
                           onTap: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => AccountDetails(),),
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => AccountDetails(userId: widget.userId,),),
                             );
                           },
                         ),
