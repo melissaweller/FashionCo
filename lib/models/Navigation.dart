@@ -1,14 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
 import '../navPages/AccountPage.dart';
-import '../navPages/CartPage.dart';
 import '../navPages/ProductPage.dart';
-
+import 'UserModel.dart';
 
 class Navigation extends StatefulWidget {
   final String? username;
+  final String? userId;
 
-  Navigation({super.key, required this.username});
+  Navigation({super.key, this.username, this.userId});
 
   @override
   State<Navigation> createState() => _NavigatingScreenState();
@@ -22,7 +22,7 @@ class _NavigatingScreenState extends State<Navigation> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: <Widget>[
-        ProductPage(),
+        ProductPage(userId: widget.userId),
         AccountPage(username: widget.username)
       ][_selectedIndex],
 

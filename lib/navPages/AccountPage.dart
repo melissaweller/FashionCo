@@ -34,6 +34,7 @@ class _AccountPageState extends State<AccountPage> {
                       ),
                       SizedBox(height: 20,),
                       Text(" ${widget.username}", style: TextStyle(fontSize: 20),),
+                      Text(" ${widget.email}", style: TextStyle(fontSize: 20),),
                     ],
                   ),
                 ),
@@ -74,26 +75,6 @@ class _AccountPageState extends State<AccountPage> {
   }
 }
 
-
-// class _CustomListTile extends StatelessWidget {
-//   final String title;
-//   final IconData leading;
-//   final IconData trailing;
-//
-//   const _CustomListTile(
-//       {Key? key, required this.title, required this.leading, required this.trailing})
-//       : super(key: key);
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return ListTile(
-//       title: Text(title),
-//       leading: Icon(leading),
-//       trailing: Icon(trailing),
-//     );
-//   }
-// }
-
 class _CustomListTile extends StatelessWidget {
   final String title;
   final IconData leading;
@@ -120,7 +101,6 @@ class _CustomListTile extends StatelessWidget {
     );
   }
 }
-
 
 class _SingleSection extends StatelessWidget {
   final String? title;

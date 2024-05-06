@@ -30,8 +30,10 @@ class _LoginPageState extends State<LoginPage> {
     if(user != null){
       print("User has been successfully signed in");
 
-      String? username = await getIdByEmail(_emailController.text);
-      Navigator.push(context, MaterialPageRoute(builder: (context)=> Navigation(username: username)));
+      // String? username = await getUsernameByEmail(_emailController.text);
+      String? userId = await getIDByEmail(_emailController.text);
+
+      Navigator.push(context, MaterialPageRoute(builder: (context)=> Navigation(userId: userId)));
     }
     else{
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Your email or password is invalid. Please try again.")));
@@ -128,8 +130,8 @@ class _LoginPageState extends State<LoginPage> {
   }
 }
 
-Future<String?> getIdByEmail(String email) async {
-  String? username;
+Future<String?> getIDByEmail(String email) async {
+  String? userId;
 
   try {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
@@ -139,11 +141,31 @@ Future<String?> getIdByEmail(String email) async {
 
     if (querySnapshot.docs.isNotEmpty) {
       var userModel = UserModel.fromSnapshot(querySnapshot.docs.first as DocumentSnapshot<Map<String, dynamic>>);
-      username = userModel.username;
+      userId = userModel.id;
     }
   } catch (error) {
-    print('Error getting username: $error');
+    print('Error getting ID: $error');
   }
 
-  return username;
+  return userId;
 }
+
+// Future<String?> getId(String email) async {
+//   String? id;
+//
+//   try {
+//     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+//         .collection('Users')
+//         .where('email', isEqualTo: email)
+//         .get();
+//
+//     if (querySnapshot.docs.isNotEmpty) {
+//       var userModel = UserModel.fromSnapshot(querySnapshot.docs.first as DocumentSnapshot<Map<String, dynamic>>);
+//       id = userModel.id;
+//     }
+//   } catch (error) {
+//     print('Error getting id: $error');
+//   }
+//
+//   return id;
+// }

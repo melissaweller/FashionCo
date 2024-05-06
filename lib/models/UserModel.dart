@@ -7,11 +7,11 @@ class UserModel{
 
   UserModel({this.id,this.username,this.email});
 
-  static UserModel fromSnapshot(DocumentSnapshot<Map<String,dynamic>> snapshot){
+  static UserModel fromSnapshot(DocumentSnapshot<Map<String, dynamic>> snapshot) {
     return UserModel(
-        username: snapshot['username'],
-        email: snapshot['email'],
-        id: snapshot ['id']
+      username: snapshot.data()!['username'],
+      email: snapshot.data()!['email'],
+      id: snapshot.data()!['id'],
     );
   }
 

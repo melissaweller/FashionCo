@@ -8,6 +8,11 @@ import 'ItemPage.dart';
 import 'ProductCard.dart';
 
 class ProductPage extends StatefulWidget {
+
+  final String? userId;
+
+  const ProductPage({Key? key, this.userId});
+
   @override
   _ProductPageState createState() => _ProductPageState();
 }
@@ -61,29 +66,6 @@ class _ProductPageState extends State<ProductPage> {
     );
   }
 
-  // void addToCart(dynamic product) {
-  //   int existingIndex = cart.indexWhere((item) => item['id'] == product['id']);
-  //
-  //   if (existingIndex != -1) {
-  //     setState(() {
-  //       cart[existingIndex]['quantity'] += 1;
-  //     });
-  //   } else {
-  //     setState(() {
-  //       cart.add({...product, 'quantity': 1});
-  //     });
-  //
-  //     // Add product to Firestore cart collection
-  //     FirebaseFirestore.instance.collection('cart').add({
-  //       'id': product['id'],
-  //       'title': product['title'],
-  //       'price': product['price'],
-  //       'quantity': 1, // Initial quantity is 1
-  //       'image': product['image'],
-  //     });
-  //   }
-  // }
-
   void addToCart(dynamic product) {
     int existingIndex = cart.indexWhere((item) => item['id'] == product['id']);
 
@@ -101,11 +83,12 @@ class _ProductPageState extends State<ProductPage> {
       });
       // Add product to Firestore cart collection
       FirebaseFirestore.instance.collection('cart').add({
-        'id': product['id'],
+        'product_id': product['id'],
         'title': product['title'],
         'price': product['price'],
         'quantity': 1, // Initial quantity is 1
         'image': product['image'],
+        'id': widget.userId
       }).then((docRef) {
         // Store the document ID for future updates
         cart[cart.length - 1]['docId'] = docRef.id;
