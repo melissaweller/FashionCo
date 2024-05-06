@@ -30,7 +30,6 @@ class _LoginPageState extends State<LoginPage> {
     if(user != null){
       print("User has been successfully signed in");
 
-      // String? username = await getUsernameByEmail(_emailController.text);
       String? userId = await getIDByEmail(_emailController.text);
 
       Navigator.push(context, MaterialPageRoute(builder: (context)=> Navigation(userId: userId)));
@@ -149,23 +148,3 @@ Future<String?> getIDByEmail(String email) async {
 
   return userId;
 }
-
-// Future<String?> getId(String email) async {
-//   String? id;
-//
-//   try {
-//     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-//         .collection('Users')
-//         .where('email', isEqualTo: email)
-//         .get();
-//
-//     if (querySnapshot.docs.isNotEmpty) {
-//       var userModel = UserModel.fromSnapshot(querySnapshot.docs.first as DocumentSnapshot<Map<String, dynamic>>);
-//       id = userModel.id;
-//     }
-//   } catch (error) {
-//     print('Error getting id: $error');
-//   }
-//
-//   return id;
-// }

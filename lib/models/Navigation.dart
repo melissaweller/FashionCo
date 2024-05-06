@@ -5,10 +5,9 @@ import '../navPages/ProductPage.dart';
 import 'UserModel.dart';
 
 class Navigation extends StatefulWidget {
-  final String? username;
   final String? userId;
 
-  Navigation({super.key, this.username, this.userId});
+  Navigation({required this.userId});
 
   @override
   State<Navigation> createState() => _NavigatingScreenState();
@@ -23,7 +22,7 @@ class _NavigatingScreenState extends State<Navigation> {
     return Scaffold(
       body: <Widget>[
         ProductPage(userId: widget.userId),
-        AccountPage(username: widget.username)
+        AccountPage(userId: widget.userId)
       ][_selectedIndex],
 
       bottomNavigationBar: BottomNavigationBar(

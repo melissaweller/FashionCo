@@ -1,20 +1,42 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:profile_photo/profile_photo.dart';
 
+import '../models/UserModel.dart';
 import 'AccountDetails.dart';
 import 'MyOrders.dart';
 
 class AccountPage extends StatefulWidget {
 
-  final String? username;
-  final String? email;
-  const AccountPage({this.username, this.email});
+  final String? userId;
+
+  const AccountPage({this.userId});
 
   @override
   State<AccountPage> createState() => _AccountPageState();
 }
 
 class _AccountPageState extends State<AccountPage> {
+
+  String? username;
+  String? email;
+
+  @override
+  void initState()  {
+    super.initState();
+    setInfo();
+  }
+
+  void setInfo() async {
+    String? name = await getUsernameById(widget.userId);
+    String? em = await getEmailById(widget.userId);
+    setState(() {
+      username = name;
+      email = em;
+    });
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,8 +55,8 @@ class _AccountPageState extends State<AccountPage> {
                         outlineWidth: 2,
                       ),
                       SizedBox(height: 20,),
-                      Text(" ${widget.username}", style: TextStyle(fontSize: 20),),
-                      Text(" ${widget.email}", style: TextStyle(fontSize: 20),),
+                      Text(" ${username}", style: TextStyle(fontSize: 20),),
+                      Text(" ${email}", style: TextStyle(fontSize: 20),),
                     ],
                   ),
                 ),
@@ -73,6 +95,46 @@ class _AccountPageState extends State<AccountPage> {
         )
     );
   }
+}
+
+Future<String?> getUsernameById(String? id) async {
+  String? username;
+
+  try {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('Users')
+        .where('id', isEqualTo: id)
+        .get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      var userModel = UserModel.fromSnapshot(querySnapshot.docs.first as DocumentSnapshot<Map<String, dynamic>>);
+      username = userModel.username;
+    }
+  } catch (error) {
+    print('Error getting ID: $error');
+  }
+
+  return username;
+}
+
+Future<String?> getEmailById(String? id) async {
+  String? email;
+
+  try {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('Users')
+        .where('id', isEqualTo: id)
+        .get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      var userModel = UserModel.fromSnapshot(querySnapshot.docs.first as DocumentSnapshot<Map<String, dynamic>>);
+      email = userModel.email;
+    }
+  } catch (error) {
+    print('Error getting ID: $error');
+  }
+
+  return email;
 }
 
 class _CustomListTile extends StatelessWidget {

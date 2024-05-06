@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../models/UserModel.dart';
 import 'CartPage.dart';
 import 'ItemPage.dart';
 import 'ProductCard.dart';
@@ -18,6 +19,16 @@ class ProductPage extends StatefulWidget {
 }
 
 class _ProductPageState extends State<ProductPage> {
+
+  String? email;
+
+  void setInfo() async {
+    String? em = await getEmailById(widget.userId);
+    setState(() {
+      email = em;
+    });
+  }
+
   List<dynamic> searchResults = [];
   List<dynamic> allProducts = []; // Store all products
   List<dynamic> cart = []; // Initialize cart
@@ -27,6 +38,7 @@ class _ProductPageState extends State<ProductPage> {
   void initState() {
     super.initState();
     fetchSearchResults();
+    setInfo();
   }
 
   Future<void> fetchSearchResults() async {
@@ -88,7 +100,7 @@ class _ProductPageState extends State<ProductPage> {
         'price': product['price'],
         'quantity': 1, // Initial quantity is 1
         'image': product['image'],
-        'id': widget.userId
+        'email': email
       }).then((docRef) {
         // Store the document ID for future updates
         cart[cart.length - 1]['docId'] = docRef.id;
@@ -150,4 +162,24 @@ class _ProductPageState extends State<ProductPage> {
       ),
     );
   }
+}
+
+Future<String?> getEmailById(String? id) async {
+  String? email;
+
+  try {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('Users')
+        .where('id', isEqualTo: id)
+        .get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      var userModel = UserModel.fromSnapshot(querySnapshot.docs.first as DocumentSnapshot<Map<String, dynamic>>);
+      email = userModel.email;
+    }
+  } catch (error) {
+    print('Error getting ID: $error');
+  }
+
+  return email;
 }
