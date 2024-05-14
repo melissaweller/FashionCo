@@ -95,7 +95,7 @@ class CartPage extends StatelessWidget {
                     minimumSize: Size(80, 40)
                 ),
                 onPressed: (){
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => CheckoutPage1(userEmail: userEmail,),),);
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => CheckoutPage1(userEmail: userEmail, cart: cartItems,),),);
                 },
                 child: Text('Checkout', style: TextStyle(fontSize: 16, color: Colors.white),),
               ),

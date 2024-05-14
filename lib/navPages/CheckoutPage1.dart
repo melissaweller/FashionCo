@@ -1,13 +1,14 @@
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
-import '../models/UserModel.dart';
+import 'package:project/navPages/PaymentPage.dart';
 
 class CheckoutPage1 extends StatefulWidget {
 
   final String userEmail;
+  final List<dynamic> cart;
 
-  CheckoutPage1({required this.userEmail});
+  CheckoutPage1({required this.userEmail, required this.cart});
 
   @override
   State<CheckoutPage1> createState() => _CheckoutPage1State();
@@ -16,12 +17,11 @@ class CheckoutPage1 extends StatefulWidget {
 class _CheckoutPage1State extends State<CheckoutPage1> {
 
   final _nameController = TextEditingController();
-  late var _emailController = TextEditingController();
+  late var _emailController = TextEditingController(text: widget.userEmail);
   final _addressController = TextEditingController();
   final _postalCodeController = TextEditingController();
   final _cityController = TextEditingController();
-  final _countryController = TextEditingController();
-  final _provinceController = TextEditingController();
+  late var _countryController = TextEditingController(text: 'Canada');
 
   // Define list of provinces
   List<String> provinces = [
@@ -42,8 +42,41 @@ class _CheckoutPage1State extends State<CheckoutPage1> {
   @override
   void initState() {
     super.initState();
-    _emailController = TextEditingController(text: widget.userEmail);
   }
+
+  // Future<void> checkout(String userEmail, Map<String, dynamic> shippingInfo, List<dynamic> cart) async {
+  //   // Add shipping information to Firestore
+  //   await FirebaseFirestore.instance.collection('shipping_info').add(shippingInfo);
+  //
+  //   // Add each product in the cart to Firestore
+  //   for (var product in cart) {
+  //     await FirebaseFirestore.instance.collection('orders').add({
+  //       'user_email': userEmail,
+  //       'product_title': product['title'],
+  //       'product_price': product['price'],
+  //       // Add more fields as needed
+  //     });
+  //   }
+  // }
+
+
+  Future<void> checkout(String userEmail, Map<String, dynamic> shippingInfo, List<dynamic> cart) async {
+    // Create a map to represent the order
+    Map<String, dynamic> orderData = {
+      'user_email': userEmail,
+      'shipping_info': shippingInfo,
+      'products': cart.map((product) => {
+        'title': product['title'],
+        'price': product['price'],
+        // Add more product details as needed
+      }).toList(),
+    };
+
+    // Add the order document to the 'orders' collection
+    await FirebaseFirestore.instance.collection('orders').add(orderData);
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -173,8 +206,18 @@ class _CheckoutPage1State extends State<CheckoutPage1> {
                             backgroundColor: Colors.pink[400],
                             minimumSize: Size(300, 40)
                         ),
-                        onPressed: (){
-
+                        onPressed: () async {
+                          Map<String, dynamic> shippingInfo = {
+                            'name': _nameController.text,
+                            'email': _emailController.text,
+                            'address': _addressController.text,
+                            'city': _cityController.text,
+                            'postal_code': _postalCodeController.text,
+                            'province': _selectedProvince,
+                            'country': _countryController.text,
+                          };
+                          await checkout(widget.userEmail, shippingInfo, widget.cart);
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => PaymentPage()));
                         },
                         child: Text('Continue to Payment Information')
                     ),
