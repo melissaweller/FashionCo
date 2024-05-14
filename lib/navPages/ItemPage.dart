@@ -19,9 +19,18 @@ class ItemPage extends StatelessWidget {
           padding: EdgeInsets.all(40),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Image.network(product['image'], height: 150, ),
+              Image.network(product['image'], height: 250, ),
               SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.star, color: Colors.yellow,),
+                  Text('${product['rating']['rate']}  (${product['rating']['count']})', style: TextStyle(fontSize: 16),),
+                ],
+              ),
+              SizedBox(height: 20,),
               Text(product['title'], style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
               SizedBox(height: 20),
               Text('\$${product['price'].toString()}', style: TextStyle(fontSize: 24, color: Colors.green)),

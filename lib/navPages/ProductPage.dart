@@ -30,8 +30,8 @@ class _ProductPageState extends State<ProductPage> {
   }
 
   List<dynamic> searchResults = [];
-  List<dynamic> allProducts = []; // Store all products
-  List<dynamic> cart = []; // Initialize cart
+  List<dynamic> allProducts = [];
+  List<dynamic> cart = [];
   TextEditingController _searchController = TextEditingController();
 
   @override
@@ -46,7 +46,7 @@ class _ProductPageState extends State<ProductPage> {
     if (response.statusCode == 200) {
       setState(() {
         searchResults = json.decode(response.body);
-        allProducts = List.from(searchResults); // Store all products
+        allProducts = List.from(searchResults);
       });
     } else {
       throw Exception('Failed to load search results');
@@ -56,8 +56,9 @@ class _ProductPageState extends State<ProductPage> {
   void search(String query) {
     List<dynamic> results = [];
     if (query.isEmpty) {
-      results = List.from(allProducts); // Show all products if search query is empty
-    } else {
+      results = List.from(allProducts);
+    }
+    else {
       results = allProducts
           .where((product) =>
       product['title'].toLowerCase().contains(query.toLowerCase()) ||
@@ -85,7 +86,7 @@ class _ProductPageState extends State<ProductPage> {
       setState(() {
         cart[existingIndex]['quantity'] += 1;
       });
-      // Update quantity in Firestore
+
       FirebaseFirestore.instance.collection('cart').doc(cart[existingIndex]['docId']).update({
         'quantity': cart[existingIndex]['quantity'],
       });
@@ -93,7 +94,7 @@ class _ProductPageState extends State<ProductPage> {
       setState(() {
         cart.add({...product, 'quantity': 1});
       });
-      // Add product to Firestore cart collection
+
       FirebaseFirestore.instance.collection('cart').add({
         'product_id': product['id'],
         'title': product['title'],
@@ -102,21 +103,14 @@ class _ProductPageState extends State<ProductPage> {
         'image': product['image'],
         'email': email
       }).then((docRef) {
-        // Store the document ID for future updates
         cart[cart.length - 1]['docId'] = docRef.id;
       });
     }
   }
 
   void navigateToCartPage(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => CartPage(userEmail: email,),
-      ),
-    );
+    Navigator.push(context, MaterialPageRoute(builder: (context) => CartPage(userEmail: email,),),);
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -132,7 +126,7 @@ class _ProductPageState extends State<ProductPage> {
           ),
         ],
       ),
-      body: Column(
+      body: ListView(
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -145,17 +139,19 @@ class _ProductPageState extends State<ProductPage> {
               ),
             ),
           ),
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                children: searchResults.map((product) {
-                  return ProductCard(
-                    product: product,
-                    onTap: () => navigateToItemPage(context, product),
-                    addToCart: () => addToCart(product), // Pass the addToCart function to ProductCard
-                  );
-                }).toList(),
-              ),
+          Flexible(
+            child: GridView.count(
+              crossAxisCount: 2, // Display 2 products per row
+              childAspectRatio: 0.9, // Adjust this value to make the grid items bigger
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              children: searchResults.map((product) {
+                return ProductCard(
+                  product: product,
+                  onTap: () => navigateToItemPage(context, product),
+                  addToCart: () => addToCart(product),
+                );
+              }).toList(),
             ),
           ),
         ],

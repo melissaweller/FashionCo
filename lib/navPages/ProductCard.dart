@@ -24,19 +24,23 @@ class ProductCard extends StatelessWidget {
             Expanded(
               flex: 2,
               child: Padding(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(5),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text(product['title'], style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                    SizedBox(height: 5),
-                    Text('\$${product['price'].toString()}', style: TextStyle(fontSize: 14, color: Colors.green)),
-                    SizedBox(height: 5),
+                    Text(product['title'], style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                    Text('\$${product['price'].toString()}', style: TextStyle(fontSize: 12, color: Colors.green)),
                     ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.black,
+                          backgroundColor: Colors.pink[400],
+                          minimumSize: Size(10, 20)
+                      ),
                       onPressed: (){
                         addToCart();
                       }, // Call addToCart function when button is pressed
-                      child: Text('Add to Cart'),
+                      child: Text('Add to Cart', style: TextStyle(fontSize: 10, color: Colors.white),),
                     ),
                   ],
                 ),
@@ -47,4 +51,8 @@ class ProductCard extends StatelessWidget {
       ),
     );
   }
+
+
+
+
 }
