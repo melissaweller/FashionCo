@@ -44,39 +44,29 @@ class _CheckoutPage1State extends State<CheckoutPage1> {
     super.initState();
   }
 
-  // Future<void> checkout(String userEmail, Map<String, dynamic> shippingInfo, List<dynamic> cart) async {
-  //   // Add shipping information to Firestore
-  //   await FirebaseFirestore.instance.collection('shipping_info').add(shippingInfo);
-  //
-  //   // Add each product in the cart to Firestore
-  //   for (var product in cart) {
-  //     await FirebaseFirestore.instance.collection('orders').add({
-  //       'user_email': userEmail,
-  //       'product_title': product['title'],
-  //       'product_price': product['price'],
-  //       // Add more fields as needed
-  //     });
-  //   }
-  // }
-
-
   Future<void> checkout(String userEmail, Map<String, dynamic> shippingInfo, List<dynamic> cart) async {
+
+    DocumentSnapshot orderNumberSnapshot = await FirebaseFirestore.instance.collection('order_numbers').doc('latest').get();
+    int latestOrderNumber = orderNumberSnapshot.exists ? orderNumberSnapshot['order_number'] : 0;
+
+    int newOrderNumber = latestOrderNumber + 1;
+
+    await FirebaseFirestore.instance.collection('order_numbers').doc('latest').set({'order_number': newOrderNumber});
+
     // Create a map to represent the order
     Map<String, dynamic> orderData = {
+      'order_number': newOrderNumber.toString(),
+      'order_status': 'Pending',
       'user_email': userEmail,
       'shipping_info': shippingInfo,
       'products': cart.map((product) => {
         'title': product['title'],
         'price': product['price'],
-        // Add more product details as needed
       }).toList(),
     };
 
-    // Add the order document to the 'orders' collection
     await FirebaseFirestore.instance.collection('orders').add(orderData);
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -217,7 +207,12 @@ class _CheckoutPage1State extends State<CheckoutPage1> {
                             'country': _countryController.text,
                           };
                           await checkout(widget.userEmail, shippingInfo, widget.cart);
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => PaymentPage()));
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PaymentPage(cart: widget.cart),
+                            ),
+                          );
                         },
                         child: Text('Continue to Payment Information')
                     ),
