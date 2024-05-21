@@ -1,10 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:profile_photo/profile_photo.dart';
-
+import '../login/LoginPage.dart';
+import '../models/Notification.dart';
 import '../models/UserModel.dart';
 import 'AccountDetails.dart';
 import 'MyOrders.dart';
+import 'package:timezone/data/latest.dart' as tz;
 
 class AccountPage extends StatefulWidget {
 
@@ -25,6 +28,7 @@ class _AccountPageState extends State<AccountPage> {
   @override
   void initState()  {
     super.initState();
+    tz.initializeTimeZones();
     setInfo();
   }
 
@@ -36,6 +40,21 @@ class _AccountPageState extends State<AccountPage> {
       email = em;
     });
   }
+
+  void _logout() async {
+    try {
+
+      await FirebaseAuth.instance.signOut();
+      NotificaionService().showNotification(1, 'Logging Out', 'Officially Logged Out');
+      Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
+        builder: (context) => LoginPage(),
+      ), (route) => false);
+    } catch (e) {
+      print("Error logging out: $e");
+    }
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -79,17 +98,15 @@ class _AccountPageState extends State<AccountPage> {
                           },
                         ),
                         Divider(color: Colors.black,),
-                        _CustomListTile(title: "Account Details", leading: Icons.cloud_outlined, trailing: Icons.arrow_forward,
+                        _CustomListTile(title: "Account Details", leading: Icons.person, trailing: Icons.arrow_forward,
                           onTap: () {
                             Navigator.push(context, MaterialPageRoute(builder: (context) => AccountDetails(userId: widget.userId,),),
                             );
                           },
                         ),
                         Divider(color: Colors.black,),
-                        _CustomListTile(title: "Log Out", leading: Icons.cloud_outlined, trailing: Icons.arrow_forward,
-                          onTap: () {
-                            // implement log out
-                          },
+                        _CustomListTile(title: "Log Out", leading: Icons.logout, trailing: Icons.arrow_forward,
+                          onTap: _logout,
                         ),
                         Divider(color: Colors.black,),
                       ],
@@ -201,3 +218,4 @@ class _SingleSection extends StatelessWidget {
     );
   }
 }
+

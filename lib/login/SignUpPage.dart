@@ -38,10 +38,11 @@ class _SignUpPageState extends State<SignUpPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
+      body: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            SizedBox(height: 60,),
             Container(
               height: 200,
               width: 200,
@@ -98,6 +99,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     SizedBox(height: 10,),
                     TextField(
                       controller: _passwordController,
+                      obscureText: true,
                       decoration: InputDecoration(
                         border: OutlineInputBorder(),
                         labelText: 'Password',

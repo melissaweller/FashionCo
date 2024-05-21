@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../models/UserModel.dart';
+import 'OrderDetailsPage.dart';
 
 class MyOrders extends StatefulWidget {
   final String? userId;
@@ -103,37 +104,15 @@ Future<String?> getEmailById(String? id) async {
   return email;
 }
 
-  void _showOrderDetails(BuildContext context, Map<String, dynamic> orderData) {
-    List<dynamic> products = orderData['products'];
+void _showOrderDetails(BuildContext context, Map<String, dynamic> orderData) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => OrderDetailsPage(orderData: orderData),
+    ),
+  );
+}
 
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Order Details'),
-          content: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('Products:'),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: products.map((product) {
-                  return Text('${product['title']} - \$${product['price']}');
-                }).toList(),
-              ),
-            ],
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Close'),
-            ),
-          ],
-        );
-      },
-    );
-  }
+
+
 

@@ -3,8 +3,11 @@ import 'package:flutter/material.dart';
 import 'HomePage.dart';
 import 'package:firebase_core/firebase_core.dart';
 
+import 'models/Notification.dart';
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await NotificaionService().initNotification();
   await Firebase.initializeApp();
   runApp(MyApp());
 }

@@ -90,6 +90,7 @@ class _LoginPageState extends State<LoginPage> {
                     SizedBox(height: 10,),
                     TextField(
                       controller: _passwordController,
+                      obscureText: true,
                       decoration: InputDecoration(
                         border: OutlineInputBorder(),
                         labelText: 'Password',
