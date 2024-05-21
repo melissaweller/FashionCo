@@ -91,10 +91,6 @@ class _ProductPageState extends State<ProductPage> {
         'quantity': cart[existingIndex]['quantity'],
       });
     } else {
-      setState(() {
-        cart.add({...product, 'quantity': 1});
-      });
-
       FirebaseFirestore.instance.collection('cart').add({
         'product_id': product['id'],
         'title': product['title'],
@@ -103,10 +99,17 @@ class _ProductPageState extends State<ProductPage> {
         'image': product['image'],
         'email': email
       }).then((docRef) {
-        cart[cart.length - 1]['docId'] = docRef.id;
+        setState(() {
+          cart.add({
+            ...product,
+            'quantity': 1,
+            'docId': docRef.id, // Assign the docId here
+          });
+        });
       });
     }
   }
+
 
   void navigateToCartPage(BuildContext context) {
     Navigator.push(context, MaterialPageRoute(builder: (context) => CartPage(userEmail: email,),),);

@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:project/navPages/AccountPage.dart';
+import '../models/Navigation.dart';
 import '../models/UserModel.dart';
 import 'ProductPage.dart';
 
 class checkoutPage2 extends StatefulWidget {
-  final String? userEmail;
+  final String? email;
   final List<dynamic> cart;
 
-  checkoutPage2({required this.cart, this.userEmail});
+  checkoutPage2({required this.cart, required this.email});
 
   @override
   _checkoutPage2State createState() => _checkoutPage2State();
@@ -26,7 +28,7 @@ class _checkoutPage2State extends State<checkoutPage2> {
   }
 
   void setInfo() async {
-    String? id = await getID(widget.userEmail);
+    String? id = await getIdByEmail(widget.email);
 
     setState(() {
       userId = id;
@@ -34,7 +36,6 @@ class _checkoutPage2State extends State<checkoutPage2> {
   }
 
   Future<void> _getOrderNumber() async {
-    // Fetch the latest order number from Firestore
     try {
       DocumentSnapshot<Map<String, dynamic>> snapshot =
       await FirebaseFirestore.instance.collection('order_number').doc('counter').get();
@@ -48,26 +49,39 @@ class _checkoutPage2State extends State<checkoutPage2> {
   }
 
   Future<void> _confirmOrder() async {
-    // Clear the cart
-    widget.cart.clear();
-
-    // Update the order status and order number in Firestore
     try {
-      await FirebaseFirestore.instance.collection('orders').doc('$_orderNumber').update({
+      String orderDocumentId = 'ORD$_orderNumber';
+
+      DocumentSnapshot<Map<String, dynamic>> orderDocSnapshot = await FirebaseFirestore.instance.collection('orders').doc(orderDocumentId).get();
+
+      if (!orderDocSnapshot.exists) {
+        print('Order document does not exist');
+        return;
+      }
+
+      await orderDocSnapshot.reference.update({
         'order_status': 'Confirmed',
       });
 
-      // Increment the order number in Firestore
-      await FirebaseFirestore.instance.collection('order_number').doc('counter').update({
-        'latest_order_number': _orderNumber!,
+      await FirebaseFirestore.instance.collection('cart')
+          .where('email', isEqualTo: widget.email)
+          .get()
+          .then((querySnapshot) {
+        querySnapshot.docs.forEach((doc) {
+          doc.reference.delete();
+        });
       });
+
+      await FirebaseFirestore.instance.collection('order_numbers').doc('latest').update({
+        'order_number': _orderNumber!,
+      });
+
+      Navigator.push(context, MaterialPageRoute(builder: (context) => Navigation(userId: userId,)));
     } catch (e) {
       print('Error confirming order: $e');
     }
-
-    // Navigate back to the home page or another page
-    Navigator.push(context,MaterialPageRoute(builder: (context) => ProductPage(userId: userId,)),);
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -116,13 +130,13 @@ class _checkoutPage2State extends State<checkoutPage2> {
   }
 }
 
-Future<String?> getID(String? userEmail) async {
+Future<String?> getIdByEmail(String? userEmail) async {
   String? id;
 
   try {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
         .collection('Users')
-        .where('id', isEqualTo: userEmail)
+        .where('email', isEqualTo: userEmail)
         .get();
 
     if (querySnapshot.docs.isNotEmpty) {

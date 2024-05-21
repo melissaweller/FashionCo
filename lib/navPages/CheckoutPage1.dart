@@ -37,35 +37,40 @@ class _CheckoutPage1State extends State<CheckoutPage1> {
     'Saskatchewan',
   ];
 
-  String? _selectedProvince; // Variable to hold selected province
+  String? _selectedProvince;
 
   @override
   void initState() {
     super.initState();
   }
 
+
   Future<void> checkout(String userEmail, Map<String, dynamic> shippingInfo, List<dynamic> cart) async {
+    try {
+      DocumentSnapshot orderNumberSnapshot = await FirebaseFirestore.instance.collection('order_numbers').doc('latest').get();
+      int latestOrderNumber = orderNumberSnapshot.exists ? orderNumberSnapshot['order_number'] : 0;
 
-    DocumentSnapshot orderNumberSnapshot = await FirebaseFirestore.instance.collection('order_numbers').doc('latest').get();
-    int latestOrderNumber = orderNumberSnapshot.exists ? orderNumberSnapshot['order_number'] : 0;
+      int newOrderNumber = latestOrderNumber + 1;
 
-    int newOrderNumber = latestOrderNumber + 1;
+      String orderDocumentId = 'ORD$newOrderNumber';
 
-    await FirebaseFirestore.instance.collection('order_numbers').doc('latest').set({'order_number': newOrderNumber});
+      await FirebaseFirestore.instance.collection('order_numbers').doc('latest').set({'order_number': newOrderNumber});
 
-    // Create a map to represent the order
-    Map<String, dynamic> orderData = {
-      'order_number': newOrderNumber.toString(),
-      'order_status': 'Pending',
-      'user_email': userEmail,
-      'shipping_info': shippingInfo,
-      'products': cart.map((product) => {
-        'title': product['title'],
-        'price': product['price'],
-      }).toList(),
-    };
+      Map<String, dynamic> orderData = {
+        'order_number': newOrderNumber.toString(),
+        'order_status': 'Pending',
+        'user_email': userEmail,
+        'shipping_info': shippingInfo,
+        'products': cart.map((product) => {
+          'title': product['title'],
+          'price': product['price'],
+        }).toList(),
+      };
 
-    await FirebaseFirestore.instance.collection('orders').add(orderData);
+      await FirebaseFirestore.instance.collection('orders').doc(orderDocumentId).set(orderData);
+    } catch (e) {
+      print('Error creating order: $e');
+    }
   }
 
   @override
@@ -210,7 +215,7 @@ class _CheckoutPage1State extends State<CheckoutPage1> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => PaymentPage(cart: widget.cart),
+                              builder: (context) => PaymentPage(cart: widget.cart, email: widget.userEmail),
                             ),
                           );
                         },

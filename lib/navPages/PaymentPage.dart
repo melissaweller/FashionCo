@@ -4,8 +4,9 @@ import 'package:project/navPages/checkoutPage2.dart';
 
 class PaymentPage extends StatefulWidget {
   final List<dynamic> cart;
+  final String email;
 
-  PaymentPage({required this.cart});
+  PaymentPage({required this.cart, required this.email});
 
   @override
   _PaymentPageState createState() => _PaymentPageState();
@@ -76,7 +77,7 @@ class _PaymentPageState extends State<PaymentPage> {
                       minimumSize: Size(300, 40),
                     ),
                     onPressed: (){
-                      Navigator.push(context,MaterialPageRoute(builder: (context) => checkoutPage2(cart: widget.cart)),);
+                      Navigator.push(context,MaterialPageRoute(builder: (context) => checkoutPage2(cart: widget.cart, email: widget.email)),);
                     },
                     child: Text('Proceed to Confirmation'),
                   ),

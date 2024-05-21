@@ -37,7 +37,6 @@ class _AccountPageState extends State<AccountPage> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -75,7 +74,7 @@ class _AccountPageState extends State<AccountPage> {
                       children: [
                         _CustomListTile(title: "My Orders", leading: Icons.language, trailing: Icons.arrow_forward,
                           onTap: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => MyOrders(),),
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => MyOrders(userId: widget.userId,),),
                             );
                           },
                         ),
