@@ -105,12 +105,7 @@ Future<String?> getEmailById(String? id) async {
 }
 
 void _showOrderDetails(BuildContext context, Map<String, dynamic> orderData) {
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => OrderDetailsPage(orderData: orderData),
-    ),
-  );
+  Navigator.push(context, MaterialPageRoute(builder: (context) => OrderDetailsPage(orderData: orderData),),);
 }
 
 

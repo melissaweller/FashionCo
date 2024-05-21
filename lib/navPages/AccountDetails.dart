@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:project/login/UpdatePassword.dart';
 
 import '../models/UserModel.dart';
 
@@ -82,7 +83,6 @@ class _AccountDetailsState extends State<AccountDetails> {
                 IconButton(
                   icon: Icon(Icons.edit),
                   onPressed: () {
-                    // Show a dialog to edit name
                     showDialog(
                       context: context,
                       builder: (BuildContext context) {
@@ -134,6 +134,14 @@ class _AccountDetailsState extends State<AccountDetails> {
                     'Password:',
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                   ),
+                ),
+                IconButton(
+                  icon: Icon(Icons.edit),
+                  onPressed: () {
+                    FirebaseAuth.instance.signOut();
+                    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => updatePassword(userId: widget.userId)),
+                            (route) => false);
+                  },
                 ),
               ],
             ),

@@ -9,35 +9,33 @@ class OrderDetailsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Order Details'),
+        title: Text('Fashion Co.'),
+        backgroundColor: Colors.pink[400],
+        centerTitle: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Order Number: ${orderData['order_number']}',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 10),
-            Text(
-              'Products:',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
+            Text('Order Number:', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),),
             SizedBox(height: 5),
+            Text('${orderData['order_number']}', style: TextStyle(fontSize: 16),),
+            SizedBox(height: 20),
+            Text('Products:', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),),
+            SizedBox(height: 10),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: (orderData['products'] as List<dynamic>).map<Widget>((product) {
                 return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 2.0),
-                  child: Row(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         '${product['title']}',
-                        style: TextStyle(fontSize: 16),
+                        style: TextStyle(fontSize: 18),
                       ),
-                      Spacer(),
                       Text(
                         '\$${product['price']}',
                         style: TextStyle(fontSize: 16),
@@ -47,7 +45,6 @@ class OrderDetailsPage extends StatelessWidget {
                 );
               }).toList(),
             ),
-            // You can add more order details here if needed
           ],
         ),
       ),

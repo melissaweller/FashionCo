@@ -1,58 +1,118 @@
-import 'package:flutter/material.dart';
 
-class ProductCard extends StatelessWidget {
+import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+class ProductCard extends StatefulWidget {
+  final userID;
   final dynamic product;
   final VoidCallback onTap;
-  final VoidCallback addToCart; // Callback to add product to cart
+  final VoidCallback addToCart;
+  final bool isFavorite; // Add a boolean flag to determine if the product is a favorite
 
-  const ProductCard({Key? key, required this.product, required this.onTap, required this.addToCart})
-      : super(key: key);
+  const ProductCard({
+    this.userID,
+    required this.product,
+    required this.onTap,
+    required this.addToCart,
+    this.isFavorite = false, // Add isFavorite parameter
+  });
+
+  @override
+  _ProductCardState createState() => _ProductCardState();
+}
+
+class _ProductCardState extends State<ProductCard> {
+  late bool isFavorite;
+
+  @override
+  void initState() {
+    super.initState();
+    isFavorite = widget.isFavorite;
+  }
+
+  Future<void> toggleFavoriteStatus() async {
+    setState(() {
+      isFavorite = !isFavorite;
+    });
+
+    final favoritesCollection = FirebaseFirestore.instance.collection('favorites');
+
+    if (isFavorite) {
+      await favoritesCollection.add({
+        'productId': widget.product['id'],
+        'userId': widget.userID,
+        'timestamp': Timestamp.now(),
+      });
+    } else {
+      final querySnapshot = await favoritesCollection
+          .where('productId', isEqualTo: widget.product['id'])
+          .where('userId', isEqualTo: widget.userID)
+          .get();
+
+      for (final doc in querySnapshot.docs) {
+        await doc.reference.delete();
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Card(
-        margin: EdgeInsets.all(10),
-        child: Row(
+    return Card(
+      elevation: 3,
+      child: InkWell(
+        onTap: widget.onTap,
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
-              flex: 1,
-              child: Image.network(product['image'], height: 100),
-            ),
-            Expanded(
-              flex: 2,
-              child: Padding(
-                padding: const EdgeInsets.all(5),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(product['title'], style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                    Text('\$${product['price'].toString()}', style: TextStyle(fontSize: 12, color: Colors.green)),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          foregroundColor: Colors.black,
-                          backgroundColor: Colors.pink[400],
-                          minimumSize: Size(10, 20)
-                      ),
-                      onPressed: (){
-                        addToCart();
-                      }, // Call addToCart function when button is pressed
-                      child: Text('Add to Cart', style: TextStyle(fontSize: 10, color: Colors.white),),
-                    ),
-                  ],
-                ),
+              child: Image.network(
+                widget.product['image'],
+                fit: BoxFit.cover,
               ),
             ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      widget.product['title'],
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      isFavorite ? Icons.favorite : Icons.favorite_border,
+                      color: isFavorite ? Colors.red : null,
+                    ),
+                    onPressed: toggleFavoriteStatus,
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Text(
+                '\$${widget.product['price']}',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+            SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: ElevatedButton(
+                onPressed: widget.addToCart,
+                child: Text('Add to Cart'),
+              ),
+            ),
+            SizedBox(height: 8),
           ],
         ),
       ),
     );
   }
-
-
-
-
 }
+
+

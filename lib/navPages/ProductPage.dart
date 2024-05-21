@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../models/Notification.dart';
 import '../models/UserModel.dart';
 import 'CartPage.dart';
 import 'ItemPage.dart';
@@ -82,6 +83,8 @@ class _ProductPageState extends State<ProductPage> {
   void addToCart(dynamic product) {
     int existingIndex = cart.indexWhere((item) => item['id'] == product['id']);
 
+    NotificaionService().showNotification(1, 'Adding to Cart', 'Adding this item to your cart!');
+
     if (existingIndex != -1) {
       setState(() {
         cart[existingIndex]['quantity'] += 1;
@@ -109,7 +112,6 @@ class _ProductPageState extends State<ProductPage> {
       });
     }
   }
-
 
   void navigateToCartPage(BuildContext context) {
     Navigator.push(context, MaterialPageRoute(builder: (context) => CartPage(userEmail: email,),),);
@@ -150,6 +152,7 @@ class _ProductPageState extends State<ProductPage> {
               physics: NeverScrollableScrollPhysics(),
               children: searchResults.map((product) {
                 return ProductCard(
+                  userID: widget.userId,
                   product: product,
                   onTap: () => navigateToItemPage(context, product),
                   addToCart: () => addToCart(product),
