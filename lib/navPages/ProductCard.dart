@@ -103,6 +103,11 @@ class _ProductCardState extends State<ProductCard> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.black,
+                    backgroundColor: Colors.pink[400],
+                    minimumSize: Size(150, 40)
+                ),
                 onPressed: widget.addToCart,
                 child: Text('Add to Cart'),
               ),

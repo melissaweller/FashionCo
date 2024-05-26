@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../models/Notification.dart';
 import 'LoginPage.dart';
 import 'package:project/models/FirebaseAuthService.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -28,7 +29,7 @@ class _SignUpPageState extends State<SignUpPage> {
     var user = await _auth.register(email, password);
 
     if(user != null){
-      print("User has been successfully created");
+      NotificaionService().showNotification(1, 'User Creation', 'User has been successfully created');
       Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPage()));
     }else{
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Your password must be at least 6 characters.")));

@@ -44,7 +44,6 @@ class _CheckoutPage1State extends State<CheckoutPage1> {
     super.initState();
   }
 
-
   Future<void> checkout(String userEmail, Map<String, dynamic> shippingInfo, List<dynamic> cart) async {
     try {
       DocumentSnapshot orderNumberSnapshot = await FirebaseFirestore.instance.collection('order_numbers').doc('latest').get();
